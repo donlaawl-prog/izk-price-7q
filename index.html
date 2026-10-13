@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0c0b09">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="เคาะราคา">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<title>Izakaya Pricing</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Shippori+Mincho:wght@600;700&display=swap">
+<style>
+/* Layout: one-column card stack for iPhone, sticky gold-on-black summary bar, thumb-sized steppers */
+:root{
+  --bg:#0c0b09; --surface:#16140f; --surface2:#1e1b14; --line:#2e281c;
+  --fg:#f4efe3; --muted:#a69d88; --gold:#c6a35a; --gold-deep:#90732C; --red:#ef4b43;
+  --ok:#5fbf82; --warn:#e8ad3c; --bad:#ef4b43;
+  --f-body:"IBM Plex Sans Thai",-apple-system,"Sukhumvit Set","Thonburi",system-ui,sans-serif;
+  --f-disp:"Shippori Mincho","Hiragino Mincho ProN","Noto Serif JP",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;padding-inline:16px;padding-block:0 40px}
+button{font:inherit;color:inherit}
+.wrap{max-width:560px;margin:0 auto}
+header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin-inline:-16px;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand h1{font-family:var(--f-disp);font-size:20px;letter-spacing:.14em;margin:0;color:var(--gold);font-weight:700}
+.brand h1 span{color:var(--red)}
+.brand small{color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 10px;min-width:0}
+.stat b{display:block;font-size:18px;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:11px;color:var(--muted);letter-spacing:.02em}
+.target{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.target button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);font-size:17px;line-height:1;touch-action:manipulation}
+.controls{display:flex;gap:8px;margin-top:10px;align-items:center}
+.seg{display:flex;flex:1;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;border-radius:8px;padding:7px 4px;font-size:13px;color:var(--muted);touch-action:manipulation}
+.seg button[aria-pressed="true"]{background:var(--gold-deep);color:#fff;font-weight:600}
+.sortbtn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--fg);white-space:nowrap;touch-action:manipulation}
+.save{font-size:11.5px;color:var(--muted);margin-top:8px;min-height:16px}
+.save.err{color:var(--warn)}
+main{display:flex;flex-direction:column;gap:16px;padding-top:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.ph{position:relative;aspect-ratio:4/3;background:#000;max-width:100%}
+.ph img{width:100%;height:100%;display:block}
+.ph .tag{position:absolute;top:10px;left:10px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;letter-spacing:.04em}
+.tag.new{background:var(--red);color:#fff}
+.tag.old{background:rgba(0,0,0,.6);color:var(--gold);border:1px solid var(--gold-deep)}
+.ph .no{position:absolute;top:10px;right:12px;font-family:var(--f-disp);color:var(--gold);font-size:13px;opacity:.85}
+.body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:12px}
+.nm h2{font-size:18px;margin:0;line-height:1.3;font-weight:700;text-wrap:balance}
+.nm .en{color:var(--muted);font-size:13px}
+.nm .jp{font-family:var(--f-disp);color:var(--gold);font-size:13px;margin-left:6px}
+.stepper{display:grid;grid-template-columns:56px 1fr 56px;gap:8px;align-items:stretch}
+.stepper button{height:56px;border-radius:14px;border:1px solid var(--gold-deep);background:var(--surface2);font-size:28px;line-height:1;color:var(--gold);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.stepper button:active{background:var(--gold-deep);color:#fff}
+.pricebox{position:relative;display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--line);border-radius:14px}
+.pricebox span{position:absolute;left:14px;color:var(--muted);font-size:16px}
+.pricebox input{width:100%;height:56px;background:transparent;border:0;color:var(--fg);text-align:center;font:700 26px var(--f-body);font-variant-numeric:tabular-nums;padding:0 28px}
+.pricebox input:focus{outline:2px solid var(--gold);outline-offset:-2px;border-radius:14px}
+.metrics{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px}
+.m{background:var(--bg);border-radius:12px;padding:8px 10px;min-width:0}
+.m span{display:block;font-size:11px;color:var(--muted)}
+.m b{font-size:17px;font-variant-numeric:tabular-nums}
+.m.fc b{font-size:22px}
+.m.fc .chip{font-size:10.5px;font-weight:600;margin-left:4px;vertical-align:3px}
+.lv-ok{color:var(--ok)} .lv-warn{color:var(--warn)} .lv-bad{color:var(--bad)}
+.bar{position:relative;height:6px;border-radius:3px;background:var(--line);overflow:visible}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:3px;transition:width .15s}
+.bar u{position:absolute;top:-4px;width:2px;height:14px;background:var(--fg);opacity:.7}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);gap:8px;min-height:28px}
+.foot button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:5px 10px;font-size:12px;color:var(--gold)}
+.note{color:var(--muted);font-size:12px;line-height:1.6;margin-top:24px;border-top:1px solid var(--line);padding-top:14px}
+.knock{display:flex;align-items:center;justify-content:center;gap:10px;height:54px;border-radius:14px;border:0;background:linear-gradient(180deg,#e0453d,#b52a23);color:#fff;font-size:18px;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 0 #6e1712;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.knock:active{transform:translateY(3px);box-shadow:0 1px 0 #6e1712}
+.knock svg{width:26px;height:26px;transform-origin:80% 80%}
+.knock.again{background:var(--surface2);color:var(--gold);border:1px solid var(--gold-deep);box-shadow:none}
+.knock.swing svg{animation:swing .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes swing{0%{transform:rotate(0)}35%{transform:rotate(-55deg)}60%{transform:rotate(18deg)}100%{transform:rotate(0)}}
+.card.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:none}20%{transform:translate(-5px,2px) rotate(-.6deg)}40%{transform:translate(5px,-2px) rotate(.6deg)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,0)}}
+.hanko{position:absolute;right:12px;bottom:12px;width:96px;height:96px;border-radius:50%;border:4px solid var(--red);color:var(--red);background:rgba(255,245,240,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-14deg);font-weight:700;line-height:1.05;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+.hanko .k{font-family:var(--f-disp);font-size:24px}
+.hanko .p{font-size:17px;font-variant-numeric:tabular-nums}
+.hanko.slam{animation:slam .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes slam{0%{transform:scale(3) rotate(-30deg);opacity:0}60%{transform:scale(.9) rotate(-12deg);opacity:1}100%{transform:scale(1) rotate(-14deg)}}
+.quip{font-size:13px;color:var(--gold);text-align:center;min-height:18px}
+.unknock{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;padding:4px}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}
+.trow .target{gap:8px;font-size:12.5px;color:var(--muted)}
+.trow .target b{font-size:15px;color:var(--fg);font-variant-numeric:tabular-nums}
+.trow .save{margin-top:0;flex:1;min-width:0}
+@media (prefers-reduced-motion:reduce){.knock.swing svg,.card.shake,.hanko.slam{animation:none}}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand"><h1>SHI<span>N</span>IJI</h1><small>Izakaya · ปรับราคาดู Fc%</small></div>
+  <div class="stats">
+    <div class="stat"><span>Fc% เฉลี่ย</span><b id="sAvg">–</b></div>
+    <div class="stat"><span>เกินเป้า</span><b id="sOver">–</b></div>
+    <div class="stat"><span>เคาะแล้ว</span><b id="sKnock" style="color:var(--gold)">0 / 31</b></div>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="หมวด">
+      <button data-cat="all" aria-pressed="true">ทั้งหมด</button>
+      <button data-cat="kushi" aria-pressed="false">ไม้ (21)</button>
+      <button data-cat="plate" aria-pressed="false">จาน (10)</button>
+    </div>
+    <button class="sortbtn" id="sortBtn">เรียง: ตามเมนู</button>
+  </div>
+  <div class="trow"><div class="save" id="save">กำลังเชื่อมต่อ…</div><div class="target"><span>เป้า Fc%</span><button id="tMinus" aria-label="ลดเป้า">−</button><b id="sTarget">35%</b><button id="tPlus" aria-label="เพิ่มเป้า">+</button></div></div>
+</header>
+<main id="list"></main>
+<p class="note">ทุนต่อไม้/จาน รวมค่าเผื่อ 25% แล้ว คิดจากใบเสนอราคาดอนเมืองพัฒนา และราคาซื้อจริงของร้าน (ต.ค. 2569) · Fc% = ทุน ÷ ราคาขาย · ราคาขายยังไม่รวม Service Charge 10% และ VAT 7% · เมนูใหม่ตั้งราคาเริ่มต้นไว้ที่ Fc% ประมาณ 35% · สีเขียว = ไม่เกินเป้า, เหลือง = เกินเป้าไม่เกิน 5%, แดง = เกินเป้ามากกว่า 5%</p>
+</div>
+
+<script>
+const ITEMS = [{"id": "K01", "cat": "kushi", "th": "เห็ดออรินจิย่าง", "en": "Grilled Eryngii Mushrooms", "jp": "エリンギ焼き", "desc": "เห็ดออรินจิหั่นท่อนเสียบไม้ ย่างเตาถ่านทาเนยโชยุ เนื้อเห็ดหนึบฉ่ำ หอมกลิ่นเนย", "isNew": false, "cost": 6.4, "old": 40, "start": 40, "fit": "contain"}, {"id": "K02", "cat": "kushi", "th": "เห็ดหอมสดย่างซอส", "en": "Grilled Shiitake Mushrooms", "jp": "生椎茸焼き", "desc": "เห็ดหอมสดทั้งดอกเสียบไม้ ย่างทาซอสทาเระ หอมกลิ่นเห็ดและควันเตาถ่าน", "isNew": false, "cost": 12.33, "old": 40, "start": 40, "fit": "contain"}, {"id": "K03", "cat": "kushi", "th": "มันหวานญี่ปุ่นย่าง", "en": "Grilled Japanese Sweet Potato", "jp": "焼きさつまいも串", "desc": "มันหวานญี่ปุ่นหั่นแว่นเสียบไม้ ย่างจนผิวเกรียม เนื้อในเหลืองทอง หวานธรรมชาติ", "isNew": true, "cost": 10.97, "old": null, "start": 39, "fit": "contain"}, {"id": "K04", "cat": "kushi", "th": "มันหวานญี่ปุ่นชุบทอด", "en": "Satsumaimo Kushiage", "jp": "さつまいも串揚げ", "desc": "มันหวานญี่ปุ่นหั่นแว่นชุบเกล็ดขนมปังทอดกรอบ เนื้อในฟูหวาน โรยเกลือทะเล", "isNew": true, "cost": 17.85, "old": null, "start": 59, "fit": "contain"}, {"id": "K05", "cat": "kushi", "th": "ไข่หวานย่างเสียบไม้", "en": "Tamagoyaki Kushi", "jp": "玉子焼き串", "desc": "ไข่ม้วนญี่ปุ่นหั่นชิ้นเสียบไม้ ย่างทาซอสทาเระหวานเค็ม หอมกลิ่นเกรียมจากเตาถ่าน", "isNew": true, "cost": 16.01, "old": null, "start": 49, "fit": "contain"}, {"id": "K06", "cat": "kushi", "th": "หนังไก่ทอดซอสเกลือ", "en": "Crispy Chicken Skin", "jp": "鶏皮揚げ 塩ダレ", "desc": "หนังไก่ร้อยไม้แบบเกลียว ทอดจนกรอบ ราดซอสเกลือ", "isNew": false, "cost": 6.44, "old": 60, "start": 60, "fit": "contain"}, {"id": "K07", "cat": "kushi", "th": "ไส้หมูย่าง", "en": "Grilled Pork Intestines", "jp": "豚ホルモン焼き", "desc": "ไส้หมูทำความสะอาดอย่างดี เสียบไม้ย่างทาซอสทาเระจนเงา หนึบกรอบขอบ", "isNew": false, "cost": 16.58, "old": 80, "start": 80, "fit": "contain"}, {"id": "K08", "cat": "kushi", "th": "กุ้งย่างเกลือ", "en": "Ebi Shioyaki", "jp": "海老塩焼き", "desc": "กุ้งตัวใหญ่ไว้หางเสียบไม้ย่างเกลือ เนื้อแน่นเด้ง หวานตามธรรมชาติ", "isNew": true, "cost": 17.79, "old": null, "start": 59, "fit": "contain"}, {"id": "K09", "cat": "kushi", "th": "กุ้งชุบทอด", "en": "Ebi Kushiage", "jp": "海老串揚げ", "desc": "กุ้งตัวใหญ่ไว้หางชุบเกล็ดขนมปังทอดกรอบสีทอง เนื้อกุ้งเด้ง จิ้มซอสคุชิคัตสึ", "isNew": true, "cost": 19.43, "old": null, "start": 59, "fit": "contain"}, {"id": "K10", "cat": "kushi", "th": "เนื้อย่างสไตล์ญี่ปุ่น", "en": "Beef Yakiniku", "jp": "和風牛串焼き", "desc": "เนื้อวัวหมักซอสยากินิกุ เสียบไม้ย่างเตาถ่าน นุ่มฉ่ำ", "isNew": false, "cost": 54.48, "old": 120, "start": 120, "fit": "contain"}, {"id": "K11", "cat": "kushi", "th": "พิคานย่าย่างเกลือวาซาบิ", "en": "Picanha Shio Wasabi", "jp": "ピッカーニャ塩焼き わさび添え", "desc": "เนื้อพิคานย่าติดมันเสียบไม้ ย่างเกลือ เสิร์ฟพร้อมวาซาบิสดบนทุกชิ้น", "isNew": true, "cost": 78.0, "old": null, "start": 229, "fit": "contain"}, {"id": "K12", "cat": "kushi", "th": "ยากิโทริ", "en": "Yakitori", "jp": "焼き鳥", "desc": "สะโพกไก่สลับต้นหอมญี่ปุ่น เสียบไม้ย่างทาซอสทาเระ", "isNew": false, "cost": 11.77, "old": 80, "start": 80, "fit": "contain"}, {"id": "K13", "cat": "kushi", "th": "บูตะโทริ", "en": "Butatori", "jp": "豚と鶏の串", "desc": "หมูและไก่สลับต้นหอมญี่ปุ่น เสียบไม้ย่าง ได้ทั้งความนุ่มของหมูและความฉ่ำของไก่", "isNew": false, "cost": 14.14, "old": 80, "start": 80, "fit": "contain"}, {"id": "K14", "cat": "kushi", "th": "ไก่ย่างสไตล์ญี่ปุ่น", "en": "Grilled Chicken Japanese Style", "jp": "和風鶏串焼き", "desc": "สะโพกไก่ชิ้นใหญ่ติดหนัง เสียบไม้ย่างทาซอสทาเระจนหนังเกรียมหอม", "isNew": false, "cost": 12.56, "old": 60, "start": 60, "fit": "contain"}, {"id": "K15", "cat": "kushi", "th": "สึคุเนะ ไก่บดปั้นย่าง", "en": "Tsukune", "jp": "つくね", "desc": "ไก่บดปรุงรสปั้นเป็นแท่ง ย่างทาซอสทาเระ นุ่มฉ่ำ", "isNew": true, "cost": 14.32, "old": null, "start": 49, "fit": "contain"}, {"id": "K16", "cat": "kushi", "th": "ปลาไหลย่างซอสคาบายากิ", "en": "Unagi Kabayaki", "jp": "うなぎ蒲焼き串", "desc": "ปลาไหลย่างเคลือบซอสคาบายากิเข้มข้นจนขอบเกรียม โรยพริกซันโช", "isNew": true, "cost": 15.68, "old": null, "start": 49, "fit": "contain"}, {"id": "K17", "cat": "kushi", "th": "ท้องแซลมอนเสียบไม้ย่าง", "en": "Salmon Toro Shioyaki", "jp": "サーモントロ塩焼き", "desc": "ท้องแซลมอนชิ้นหนาเสียบไม้ ย่างเกลือจนผิวเกรียม มันฉ่ำละลายในปาก", "isNew": false, "cost": 58.69, "old": 160, "start": 160, "fit": "contain"}, {"id": "K18", "cat": "kushi", "th": "เบคอนพันหน่อไม้ฝรั่ง", "en": "Bacon Wrapped Grilled Asparagus", "jp": "アスパラベーコン巻き串", "desc": "เบคอนพันหน่อไม้ฝรั่งย่างเตาถ่านจนกรอบ ทาซอสบางๆ", "isNew": false, "cost": 20.03, "old": 120, "start": 120, "fit": "contain"}, {"id": "K19", "cat": "kushi", "th": "สันคอหมูย่างสไตล์ญี่ปุ่น", "en": "Grilled Pork Neck Yakiniku", "jp": "豚肩ロース焼肉串", "desc": "สันคอหมูเสียบไม้ ย่างทาซอสยากินิกุ โรยงาขาวคั่ว", "isNew": false, "cost": 20.54, "old": 60, "start": 60, "fit": "contain"}, {"id": "K20", "cat": "kushi", "th": "สันคอวัวออสเตรเลียย่างถ่าน", "en": "Grilled Australian Beef Chuck", "jp": "豪州産牛肩ロース串", "desc": "สันคอวัวออสเตรเลียหั่นชิ้นเสียบไม้ ย่างเตาถ่านทาซอสทาเระจนหอมเกรียม นุ่มฉ่ำ โรยงาขาวคั่ว", "isNew": true, "cost": 58.29, "old": null, "start": 169, "fit": "contain"}, {"id": "K21", "cat": "kushi", "th": "ไก่ชุบทอดเสียบไม้", "en": "Tori Kushikatsu", "jp": "鶏串カツ", "desc": "สะโพกไก่ชุบเกล็ดขนมปังทอดกรอบ จุ่มซอสคุชิคัตสึ เสิร์ฟพร้อมกะหล่ำปลีสด", "isNew": true, "cost": 14.2, "old": null, "start": 49, "fit": "cover"}, {"id": "P01", "cat": "plate", "th": "เนื้อคลุกฝุ่น", "en": "Grilled Beef With Toasted Rice Powder", "jp": "牛スパイシー焼き", "desc": "เนื้อย่างหั่นชิ้น คลุกข้าวคั่วและพริกป่น หอมเครื่องเทศ", "isNew": false, "cost": 89.66, "old": 240, "start": 240, "fit": "contain"}, {"id": "P02", "cat": "plate", "th": "หมูคลุกฝุ่น", "en": "Grilled Pork With Toasted Rice Powder", "jp": "豚スパイシー焼き", "desc": "หมูย่างหั่นชิ้น คลุกข้าวคั่วและพริกป่น", "isNew": false, "cost": 57.91, "old": 120, "start": 120, "fit": "contain"}, {"id": "P03", "cat": "plate", "th": "คอหมูย่าง", "en": "Grilled Pork Jowl", "jp": "豚トロ塩焼き", "desc": "คอหมูย่างเตาถ่านหั่นชิ้น โรยต้นหอม เสิร์ฟพร้อมน้ำจิ้มแจ่ว", "isNew": false, "cost": 60.41, "old": 160, "start": 160, "fit": "contain"}, {"id": "P04", "cat": "plate", "th": "เต้าหู้ทอดราดซุปดาชิ", "en": "Agedashi Tofu", "jp": "揚げ出し豆腐", "desc": "เต้าหู้ญี่ปุ่นชุบแป้งทอด ผิวบางกรอบเนื้อในนุ่ม ราดซุปดาชิอุ่นๆ โรยต้นหอมและคัตสึโอะบุชิ", "isNew": true, "cost": 37.82, "old": null, "start": 109, "fit": "contain"}, {"id": "P05", "cat": "plate", "th": "กะหล่ำปลีเกลือ", "en": "Shio Cabbage", "jp": "塩キャベツ", "desc": "กะหล่ำปลีฉีกคลุกน้ำมันงาและเกลือ กรอบสดชื่น ทานคั่นระหว่างไม้", "isNew": true, "cost": 7.49, "old": null, "start": 29, "fit": "contain"}, {"id": "P06", "cat": "plate", "th": "ไก่นัมบัน", "en": "Chicken Nanban", "jp": "チキン南蛮", "desc": "ไก่ทอดชุบไข่ จุ่มซอสเปรี้ยวหวาน ราดซอสทาร์ทาร์ เสิร์ฟพร้อมกะหล่ำปลีฝอย", "isNew": true, "cost": 37.81, "old": null, "start": 109, "fit": "contain"}, {"id": "P07", "cat": "plate", "th": "โกมะซาบะ ปลาซาบะงา", "en": "Goma Saba", "jp": "ごまさば", "desc": "ปลาซาบะเบิร์นไฟแรงจนหนังกรอบหอม ทาซอสงาโชยุ โรยงาขาวและสาหร่าย เสิร์ฟบนไชเท้าฝอย ได้แรงบันดาลใจจากโกมะซาบะ เมนูขึ้นชื่อของฮากาตะ", "isNew": true, "cost": 60.83, "old": null, "start": 179, "fit": "contain"}, {"id": "P08", "cat": "plate", "th": "หอยนางรมเนยอบฟอยล์", "en": "Kaki Butter Foil-yaki", "jp": "牡蠣バターホイル焼き", "desc": "หอยนางรมอบในฟอยล์กับเนยและต้นหอม บนเตาถ่าน บีบเลม่อนก่อนทาน", "isNew": true, "cost": 73.02, "old": null, "start": 209, "fit": "cover"}, {"id": "P09", "cat": "plate", "th": "มันฝรั่งเนย", "en": "Jaga Butter", "jp": "じゃがバター", "desc": "มันฝรั่งอบทั้งหัว ผ่ากลางใส่เนยละลาย โรยเกลือและกุยช่ายญี่ปุ่น", "isNew": true, "cost": 19.72, "old": null, "start": 59, "fit": "cover"}, {"id": "P10", "cat": "plate", "th": "ไข่ม้วนหมูสไตล์โอซาก้า", "en": "Tonpeiyaki", "jp": "とん平焼き", "desc": "หมูสามชั้นและกะหล่ำปลีห่อด้วยไข่ ราดซอสโอโคโนมิยากิและมายองเนส โรยอาโอโนริและคัตสึโอะบุชิ", "isNew": true, "cost": 42.68, "old": null, "start": 129, "fit": "cover"}];
+const S = { price:{}, knocked:{}, target:35, cat:'all', sort:'menu' };
+ITEMS.forEach(it => S.price[it.id] = it.start);
+const $ = s => document.querySelector(s);
+const fmt = n => n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const level = fc => fc <= S.target ? 'ok' : (fc <= S.target+5 ? 'warn' : 'bad');
+const cards = {};
+
+function buildCard(it, idx){
+  const el = document.createElement('article');
+  el.className='card'; el.dataset.id=it.id;
+  el.innerHTML = `
+   <div class="ph"><img src="${it.id}.jpg" alt="" loading="lazy" style="object-fit:${it.cat==='plate'?'cover':it.fit}">
+     <span class="tag ${it.isNew?'new':'old'}">${it.isNew?'เมนูใหม่':'เมนูเดิม'}</span>
+     <span class="no">${it.cat==='kushi'?'串':'皿'} ${it.id.slice(1)}</span><div class="hanko" hidden><span class="k">決定</span><span class="p"></span></div></div>
+   <div class="body">
+     <div class="nm"><h2></h2><div><span class="en"></span><span class="jp"></span></div></div>
+     <div class="stepper">
+       <button class="dec" aria-label="ลดราคา 1 บาท">−</button>
+       <label class="pricebox"><span>฿</span><input id="p-${it.id}" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="ราคาขาย"></label>
+       <button class="inc" aria-label="เพิ่มราคา 1 บาท">+</button>
+     </div>
+     <div class="metrics">
+       <div class="m"><span>ทุน</span><b>฿${fmt(it.cost)}</b></div>
+       <div class="m fc"><span>Fc%</span><b class="fcv"></b></div>
+       <div class="m"><span>กำไรต่อชิ้น</span><b class="gp"></b></div>
+     </div>
+     <div class="bar"><i></i><u></u></div>
+     <div class="foot"><span class="ref"></span><button class="reset" hidden>คืนค่า</button></div>
+     <button class="knock"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="currentColor"><rect x="4" y="6" width="14" height="7" rx="2" transform="rotate(-40 11 9.5)"/><rect x="13" y="12" width="3.2" height="17" rx="1.6" transform="rotate(-40 14.6 20.5)"/><rect x="2" y="27" width="13" height="3" rx="1.5"/></g></svg><span class="kt">เคาะราคานี้!</span></button>
+     <div class="quip"></div>
+     <div style="text-align:center"><button class="unknock" hidden>ยกเลิกการเคาะ</button></div>
+   </div>`;
+  el.querySelector('h2').textContent = it.th;
+  el.querySelector('.en').textContent = it.en;
+  el.querySelector('.jp').textContent = it.jp;
+  el.querySelector('.ref').textContent = it.old ? `ราคาเดิม ฿${it.old}` : `ราคาเริ่มต้น ฿${it.start}`;
+  const inp = el.querySelector('input');
+  inp.addEventListener('input', () => {
+    const v = parseInt(inp.value.replace(/\D/g,''),10);
+    inp.value = isNaN(v) ? '' : String(v);
+    if(!isNaN(v) && v>0){ setPrice(it.id, v, false); }
+  });
+  inp.addEventListener('blur', () => { if(!inp.value || +inp.value<=0) setPrice(it.id, S.price[it.id] || it.start); else update(it.id); });
+  inp.addEventListener('focus', () => setTimeout(()=>inp.select(),0));
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') inp.blur(); });
+  hold(el.querySelector('.dec'), () => setPrice(it.id, Math.max(1, S.price[it.id]-1)));
+  hold(el.querySelector('.inc'), () => setPrice(it.id, S.price[it.id]+1));
+  el.querySelector('.reset').addEventListener('click', () => setPrice(it.id, it.start));
+  el.querySelector('.knock').addEventListener('click', () => knock(it.id));
+  el.querySelector('.unknock').addEventListener('click', () => unknock(it.id));
+  cards[it.id] = el;
+  return el;
+}
+
+function hold(btn, fn){
+  let t1=null, t2=null, speed=150;
+  const stop = () => { clearTimeout(t1); clearTimeout(t2); t1=t2=null; };
+  const loop = () => { fn(); speed = Math.max(40, speed*0.88); t2 = setTimeout(loop, speed); };
+  btn.addEventListener('pointerdown', e => { e.preventDefault(); stop(); fn(); speed=150; t1 = setTimeout(loop, 380); });
+  ['pointerup','pointerleave','pointercancel','blur'].forEach(ev => btn.addEventListener(ev, stop));
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+  btn.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fn(); } });
+}
+
+function update(id){
+  const it = ITEMS.find(x=>x.id===id), el = cards[id], p = S.price[id];
+  const inp = el.querySelector('input');
+  if(document.activeElement !== inp) inp.value = p;
+  const fc = it.cost / p * 100, lv = level(fc);
+  const fcEl = el.querySelector('.fcv');
+  fcEl.className = 'fcv lv-'+lv;
+  fcEl.innerHTML = `${fc.toFixed(1)}%<span class="chip">${lv==='ok'?'ผ่าน':(lv==='warn'?'เกินนิด':'เกินเป้า')}</span>`;
+  const gp = el.querySelector('.gp'); gp.textContent = '฿'+fmt(p - it.cost);
+  const bar = el.querySelector('.bar i'); bar.style.width = Math.min(100, fc/70*100)+'%';
+  bar.style.background = `var(--${lv==='ok'?'ok':lv==='warn'?'warn':'bad'})`;
+  el.querySelector('.bar u').style.left = (S.target/70*100)+'%';
+  el.querySelector('.reset').hidden = (p === it.start);
+  paintKnock(id);
+}
+function paintKnock(id){
+  const el = cards[id], k = S.knocked[id], p = S.price[id];
+  const h = el.querySelector('.hanko'), btn = el.querySelector('.knock'), un = el.querySelector('.unknock');
+  h.hidden = !k; if(k) h.querySelector('.p').textContent = '฿'+k.price;
+  un.hidden = !k;
+  btn.classList.toggle('again', !!k && k.price===p);
+  btn.querySelector('.kt').textContent = !k ? 'เคาะราคานี้!' : (k.price===p ? `เคาะแล้วที่ ฿${k.price}` : `เคาะใหม่ที่ ฿${p}`);
+}
+
+function summary(){
+  const vis = ITEMS.filter(it => S.cat==='all' || it.cat===S.cat);
+  const fcs = vis.map(it => it.cost / S.price[it.id] * 100);
+  const avg = fcs.reduce((a,b)=>a+b,0)/fcs.length;
+  const over = fcs.filter(f => f > S.target).length;
+  const a = $('#sAvg'); a.textContent = avg.toFixed(1)+'%'; a.className = 'lv-'+level(avg);
+  const o = $('#sOver'); o.textContent = `${over} / ${vis.length}`; o.className = over? 'lv-bad':'lv-ok';
+  $('#sTarget').textContent = S.target+'%';
+  $('#sKnock').textContent = `${Object.keys(S.knocked).length} / ${ITEMS.length}`;
+}
+
+function layout(){
+  const list = $('#list');
+  let vis = ITEMS.filter(it => S.cat==='all' || it.cat===S.cat);
+  if(S.sort==='fc') vis = vis.slice().sort((a,b)=> b.cost/S.price[b.id] - a.cost/S.price[a.id]);
+  if(S.sort==='todo') vis = vis.slice().sort((a,b)=> (!!S.knocked[a.id]) - (!!S.knocked[b.id]));
+  ITEMS.forEach(it => cards[it.id].hidden = !vis.includes(it));
+  vis.forEach(it => list.appendChild(cards[it.id]));
+  summary();
+}
+
+function setPrice(id, v, refreshInput=true){
+  v = Math.max(1, Math.min(9999, Math.round(v)));
+  if(S.price[id] === v && refreshInput){ update(id); return; }
+  S.price[id] = v; update(id); summary(); queueSave(id);
+}
+
+// ---------- จำราคาในเครื่อง + ส่งเข้า Google Sheet ----------
+const SHEET_URL = "__SHEET_URL__";   // Apps Script Web App URL
+const SHEET_KEY = "FsCT_qIE1ZSAUQNn";   // ต้องตรงกับ KEY ใน Apps Script
+const LS = "izk-prices-v1";
+const saveEl = $('#save');
+function status(t, err){ saveEl.textContent=t; saveEl.classList.toggle('err', !!err); }
+function store(){ try{ localStorage.setItem(LS, JSON.stringify({price:S.price, knocked:S.knocked, target:S.target})); }catch(e){} }
+function restore(){ try{ const d=JSON.parse(localStorage.getItem(LS)||'null'); if(!d) return;
+  Object.keys(d.price||{}).forEach(k=>{ if(k in S.price && d.price[k]>0) S.price[k]=d.price[k]; });
+  S.knocked = d.knocked||{}; if(d.target) S.target=d.target; }catch(e){} }
+function queueSave(){ store(); }
+function sheetReady(){ return SHEET_URL.startsWith('https://script.google.com/'); }
+function post(payload){
+  if(!sheetReady()) return Promise.reject(new Error('no-url'));
+  return fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({key:SHEET_KEY},payload))});
+}
+function setTarget(v){ S.target=Math.max(15,Math.min(60,v)); ITEMS.forEach(it=>update(it.id)); layout(); store(); }
+
+// ---------- เคาะ ----------
+const QUIPS_OK = ['ปังแน่นอน ขายดีชัวร์!','กำไรสวย เชฟยิ้มกว้าง','ราคานี้ลูกค้าไม่บ่น เจ้าของไม่ร้องไห้','ดีลนี้ผ่าน! ส่งครัวได้เลย','คุ้มทั้งคนกินคนขาย'];
+const QUIPS_BAD = ['เคาะแล้ว… แต่ฝ่ายบัญชีแอบสะดุ้ง','ใจป้ำมาก! Fc% สูงไปนิดนะ','ลูกค้ารักแน่ แต่กำไรร้องไห้เบาๆ','ไม่เป็นไร เอาใจลูกค้าไว้ก่อน'];
+let actx=null;
+function bonk(){
+  try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const t=actx.currentTime, o=actx.createOscillator(), g=actx.createGain();
+    o.type='triangle'; o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(70,t+.18);
+    g.gain.setValueAtTime(.6,t); g.gain.exponentialRampToValueAtTime(.001,t+.25);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t+.26);
+  }catch(e){}
+  try{ navigator.vibrate && navigator.vibrate(40); }catch(e){}
+}
+function knock(id){
+  const it = ITEMS.find(x=>x.id===id), el = cards[id], p = S.price[id];
+  const fc = +(it.cost/p*100).toFixed(1);
+  const rec = { id, th:it.th, en:it.en, jp:it.jp, cat:it.cat==='kushi'?'ไม้':'จาน', isNew:it.isNew, price:p, cost:it.cost, fc, gp:+(p-it.cost).toFixed(2), target:S.target, oldPrice:it.old||null, startPrice:it.start, at:new Date().toISOString() };
+  rec.image = new URL(id+'.jpg', location.href).href;
+  S.knocked[id] = rec; store();
+  bonk();
+  const btn = el.querySelector('.knock'); btn.classList.remove('swing'); void btn.offsetWidth; btn.classList.add('swing');
+  el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+  paintKnock(id);
+  const h = el.querySelector('.hanko'); h.classList.remove('slam'); void h.offsetWidth; h.classList.add('slam');
+  const pool = fc <= S.target ? QUIPS_OK : QUIPS_BAD;
+  el.querySelector('.quip').textContent = pool[Math.floor(Math.random()*pool.length)];
+  summary();
+  status('กำลังส่งเข้า Google Sheet…');
+  post(Object.assign({action:'knock'},rec)).then(()=>status(`เคาะ ${it.th} ที่ ฿${p} แล้ว · ส่งเข้า Google Sheet เรียบร้อย`))
+    .catch(()=>status('ส่งเข้า Google Sheet ไม่สำเร็จ เช็กอินเทอร์เน็ตแล้วเคาะอีกครั้ง', true));
+}
+function unknock(id){
+  delete S.knocked[id]; store();
+  cards[id].querySelector('.quip').textContent='';
+  paintKnock(id); summary();
+  post({action:'unknock', id}).then(()=>status('ยกเลิกการเคาะแล้ว · ลบออกจาก Google Sheet')).catch(()=>status('ยกเลิกในเครื่องแล้ว แต่ส่งไป Google Sheet ไม่สำเร็จ', true));
+}
+
+// ---------- boot ----------
+restore();
+const list = $('#list');
+ITEMS.forEach((it,i) => list.appendChild(buildCard(it,i)));
+ITEMS.forEach(it => update(it.id));
+layout();
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  S.cat = b.dataset.cat;
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x===b));
+  layout(); window.scrollTo({top:0});
+}));
+$('#sortBtn').addEventListener('click', () => {
+  S.sort = {menu:'fc', fc:'todo', todo:'menu'}[S.sort];
+  $('#sortBtn').textContent = {menu:'เรียง: ตามเมนู', fc:'เรียง: Fc% สูงสุด', todo:'เรียง: ยังไม่เคาะ'}[S.sort];
+  layout(); window.scrollTo({top:0});
+});
+$('#tMinus').addEventListener('click', ()=> setTarget(S.target-1));
+$('#tPlus').addEventListener('click', ()=> setTarget(S.target+1));
+status(sheetReady() ? 'ราคาที่ปรับจำไว้ในเครื่องนี้ · กดเคาะแล้วส่งเข้า Google Sheet' : 'ยังไม่ได้ตั้งลิงก์ Google Sheet · เคาะได้ แต่ยังไม่ส่งข้อมูล', !sheetReady());
+</script>
+
+</body>
+</html>
